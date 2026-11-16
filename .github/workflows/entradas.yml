@@ -1,0 +1,23 @@
+name: Entradas do dia
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  entradas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Gerar entradas
+        run: python3 picks.py
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+      - name: Guardar resultado
+        run: |
+          git config user.name "robo-entradas"
+          git config user.email "robo@users.noreply.github.com"
+          git add index.html picks.json
+          git commit -m "Entradas do dia" || exit 0
+          git push
